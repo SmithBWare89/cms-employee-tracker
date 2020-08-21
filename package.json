@@ -4,9 +4,11 @@
   "description": "A projec tthat will demonstrate the use of various Node packages as well as MySQL to create an interactive database.",
   "main": "index.js",
   "dependencies": {
+    "console.table": "^0.10.0",
     "express": "^4.17.1",
     "inquirer": "^7.3.3",
     "jest": "^26.4.1",
+    "mysql2": "^2.1.0",
     "sqlite3": "^5.0.0"
   },
   "devDependencies": {},
