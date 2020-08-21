@@ -12,7 +12,9 @@
   "devDependencies": {},
   "scripts": {
     "test": "jest --watch",
-    "start": "node server.js"
+    "start": "node server.js",
+    "migrate": "sqlite3 db/employees.db < db/schema.sql",
+    "db": "sqlite3 db/employees.db"
   },
   "keywords": [],
   "author": "",
