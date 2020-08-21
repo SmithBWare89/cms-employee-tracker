@@ -1,0 +1,20 @@
+{
+  "name": "cms-employee-trqacker",
+  "version": "1.0.0",
+  "description": "A projec tthat will demonstrate the use of various Node packages as well as MySQL to create an interactive database.",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "inquirer": "^7.3.3",
+    "jest": "^26.4.1",
+    "sqlite3": "^5.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "jest --watch",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
