@@ -1,21 +1,42 @@
-# cms-employee-trqacker
- A project that will demonstrate the use of various Node packages as well as MySQL to create an interactive database.
+# [CMS Employee Tracker](http://www.github.com/SmithBWare89/cms-employee-tracker)
 
+## Description
+This package utilizes MySQL to be able to create and access a virtual database to manage data about a company's employees. Users will answer command line prompts generated using the Inquirer node package to allow the user to query the database.
 
-GIVEN a command-line application that accepts user input
-WHEN I start the application
-THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
-WHEN I choose to view all departments
-THEN I am presented with a formatted table showing department names and department ids
-WHEN I choose to view all roles
-THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
-WHEN I choose to view all employees
-THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
-WHEN I choose to add a department
-THEN I am prompted to enter the name of the department and that department is added to the database
-WHEN I choose to add a role
-THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
-WHEN I choose to add an employee
-THEN I am prompted to enter the employee’s first name, last name, role, and manager and that employee is added to the database
-WHEN I choose to update an employee role
-THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
+## Table of Contents
+* [Installation](#installation)
+* [Usage](#usage)
+* [License](#license)
+* [Languages](#languages)
+* [Contributing](#contributing)
+* [Collaborator](#collaborators)
+* [Tests](#test)
+* [Questions](#questions)
+
+## Installation
+Install `MySQL` onto your machine (REQUIRED!). Clone the repository to your machine then navigate to the directory in your terminal and run `npm install` from your command line.
+
+## Usage
+Once you've installed the node packages you will have to update the `username` and `password` fields to reflect your information for MySQL. If your username is also root then update the password field. From your terminal that's already on the root directory of this project run `npm run sql` then enter your password. Once you've logged into your MySQL then run `source db/schema.sql` to set up the tables for our database. Once that's completed run `source db/seeds.sql` if you would like to pre-populate data to test the database. If not, then open another terminal instance and navigate to the directory of this project with your MySQL still running. In your new terminal input `node index` to run the index.js file. This will prompt you to be begin the process of building your database.
+
+## License
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## Languages
+![Javascript Badge](https://img.shields.io/badge/Language-Javascript-blue)
+
+![Node Badge](https://img.shields.io/badge/Language-Node-blue)
+
+![MySQL Badge](https://img.shields.io/badge/Language-MySQL-blue)
+
+## Contributing
+Please reach out to me on Github.
+
+## Collaborators
+There were no other contributors to this project.
+
+## Test
+None
+
+## Questions
+All questions can be directed to [my email](Smithwrestling89@gmail.com).

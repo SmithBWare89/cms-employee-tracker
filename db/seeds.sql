@@ -6,7 +6,7 @@ INSERT INTO department (deptname)
 INSERT INTO roles (title, salary, department_id)
     VALUES
         ('Executive', 120000.00, 1),
-        ('Manager', 91563.63, 1),
+        ('Manager', 91563.63, 2),
         ('Assistant Manager', 75456.12, 1),
         ('Analyst', 60250.50, 2),
         ('Specialist', 45785.50, 2);

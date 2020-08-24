@@ -1,9 +1,6 @@
 const mysql = require('mysql2');
 const ctable = require('console.table');
 const inquirer = require('inquirer');
-// const Department = require('./lib/department');
-// const Employee = require('./lib/employee');
-// const Roles = require('./lib/roles');
 
 const pool = mysql.createPool({
     host: 'localhost',
@@ -57,8 +54,12 @@ start = () => {
 }
 
 viewDepartments = async () =>{
+    // SQL Statement
+    const sql = `
+    SELECT department.id AS ID, department.deptname AS Department
+    FROM department`
     // Select All Departments
-    const [rows, fields] = await promisePool.execute(`SELECT * FROM department;`);
+    const [rows, fields] = await promisePool.query(sql);
     // Format Into Table
     const table = ctable.getTable(rows);
     // Print Table
@@ -68,8 +69,13 @@ viewDepartments = async () =>{
 };
 
 viewRoles = async () => {
+    // SQL Statement
+    const sql = `
+    SELECT roles.id AS ID, roles.title AS Title, roles.salary AS Salary, department.deptname AS Department
+    FROM roles
+    LEFT JOIN department ON department.id = roles.department_id`
     // Select All Roles
-    const [rows, fields] = await promisePool.execute(`SELECT * FROM roles;`);
+    const [rows, fields] = await promisePool.query(sql);
     // Format Into Table
     const table = ctable.getTable(rows);
     // Print Table
@@ -79,8 +85,15 @@ viewRoles = async () => {
 }
 
 viewEmployees = async () => {
+    // SQL Statement
+    const sql = `
+    SELECT employee.id AS ID, first_name AS First_Name, last_name AS Last_Name, roles.title AS Role, roles.salary AS Salary, department.deptname AS Department
+    FROM employee
+    LEFT JOIN roles ON roles.id = employee.role_id
+    LEFT JOIN department ON department.id = roles.department_id;
+    `
     // Select All Employees
-    const [rows, fields] = await promisePool.execute(`SELECT * FROM employee;`);
+    const [rows, fields] = await promisePool.query(sql);
     // Format Query Data Into Table
     const table = ctable.getTable(rows);
     // Print Formatted Table
@@ -128,6 +141,12 @@ addDepartment = async () => {
 }
 
 addRole = async () => {
+    // Select All Department Names And Push Into Array
+    const deptSQL = `SELECT * FROM department;`;
+    const deptArray = [];
+    const [dept, meta] = await promisePool.execute(deptSQL);
+    dept.filter(item => {deptArray.push(item.deptname)});
+
     inquirer
     // User prompts
         .prompt([
@@ -151,7 +170,6 @@ addRole = async () => {
                 type: 'input',
                 name: 'salary',
                 message: 'Please enter the salary for the new role',
-                when: ({title}) => title,
                 validate: function(input){
                     const number = Number(input);
                     if(typeof number !== 'number' || isNaN(number)){
@@ -162,17 +180,24 @@ addRole = async () => {
                     }
                     return true;
                 }
+            },
+            {
+                type: 'list',
+                name: 'department',
+                message: 'Please select the department this role belongs to:',
+                choices: deptArray
             }
         ])
     // Logic
-        .then(async ({title, salary}) => {
+        .then(async ({title, salary, department}) => {
+            const matched = dept.find(item => item.deptname === department)
             // SQL
             const sql = 'INSERT INTO roles SET ?;';
             // Set Query Parameters
             const params = {
                 title: title,
                 salary: salary,
-                department_id: 1
+                department_id: matched.id
             };
             // Perform Query
             const [rows, fields] = await promisePool.query(sql,params);
