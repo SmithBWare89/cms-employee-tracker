@@ -14,9 +14,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "jest --watch",
-    "start": "node server.js",
-    "migrate": "sqlite3 db/employees.db < db/schema.sql",
-    "db": "sqlite3 db/employees.db"
+    "sql": "mysql -u root -p"
   },
   "keywords": [],
   "author": "",
