@@ -57,28 +57,41 @@ start = () => {
 }
 
 viewDepartments = async () =>{
+    // Select All Departments
     const [rows, fields] = await promisePool.execute(`SELECT * FROM department;`);
+    // Format Into Table
     const table = ctable.getTable(rows);
+    // Print Table
     console.log(table);
+    // Restart
     start();
 };
 
 viewRoles = async () => {
+    // Select All Roles
     const [rows, fields] = await promisePool.execute(`SELECT * FROM roles;`);
+    // Format Into Table
     const table = ctable.getTable(rows);
+    // Print Table
     console.log(table);
+    // Restart
     start();
 }
 
 viewEmployees = async () => {
+    // Select All Employees
     const [rows, fields] = await promisePool.execute(`SELECT * FROM employee;`);
+    // Format Query Data Into Table
     const table = ctable.getTable(rows);
+    // Print Formatted Table
     console.log(table);
+    // Restart Process
     start();
 }
 
 addDepartment = async () => {
     inquirer
+    // User Prompt
         .prompt(
             {
                 type: 'input',
@@ -97,20 +110,26 @@ addDepartment = async () => {
                 }
             }
         )
+    // Logic
         .then(async ({department}) => {
+            // SQL Statement
             const sql = `INSERT INTO department SET ?`;
+            // Statement Parameters
             const params = {
                 deptname: department
             }
+            // Query
             const query = await promisePool.query(sql, params, function (err, results, fields) {
                 if(err) throw err;
             });
-            return start();
+            // Restart Process
+            start();
         })
 }
 
 addRole = async () => {
     inquirer
+    // User prompts
         .prompt([
             {
                 type: 'input',
@@ -145,36 +164,45 @@ addRole = async () => {
                 }
             }
         ])
+    // Logic
         .then(async ({title, salary}) => {
+            // SQL
             const sql = 'INSERT INTO roles SET ?;';
+            // Set Query Parameters
             const params = {
                 title: title,
                 salary: salary,
                 department_id: 1
             };
+            // Perform Query
             const [rows, fields] = await promisePool.query(sql,params);
+            // Restart Process
             start();
         })
 }
 
 addEmployee = async () => {
     try{
+        // Select All Department Names And Push Into Array
         const deptSQL = `SELECT * FROM department;`;
         const deptArray = [];
         const [dept, meta] = await promisePool.execute(deptSQL);
         dept.filter(item => {deptArray.push(item.deptname)});
-    
+        
+        // Select All Role Names And Push Into Array
         const roleSQL = `SELECT * FROM roles;`;
         const rolesArray = [];
         const [role, info] = await promisePool.execute(roleSQL);
         role.filter(role => rolesArray.push(role.title));
 
+        // Select All Managers And Push Into Array
         const managersSQL = `SELECT * FROM employee WHERE role_id = 2;`;
         const managersArray = [];
         const [manager, useless] = await promisePool.execute(managersSQL);
         manager.filter(item => managersArray.push(`${item.first_name} ${item.last_name}`));
 
         inquirer
+        // Prompt User
             .prompt([
                 {
                     type: 'input',
@@ -221,29 +249,50 @@ addEmployee = async () => {
                     choices: [...managersArray, 'None']
                 }
             ])
+        // Then Perform Logic
             .then(async ({firstName, lastName, employeeRole, employeeManager}) => {
+                // SQL Statement
+                const sql = `INSERT INTO employee SET ?`;
+
+                // Attempt to find the chosen role in the database
                 const chosenRole = role.find(item => {
-                    if (employeeRole === item.title){
-                        return item.id;
-                    }
-                    return null;
+                    return employeeRole === item.title ? true : null;
                 })
-
-                // console.log(chosenRole.id);
-
+                // Find the selected manager in the database
                 const managerId = manager.find(item => {
                     const name = `${item.first_name} ${item.last_name}`;
-                    return employeeManager === name;
+                    return employeeManager === name ? true : null;
                 })
 
-                const sql = `INSERT INTO employee SET ?`;
-                const params = {
-                    first_name: firstName,
-                    last_name: lastName,
-                    role_id: chosenRole.id,
-                    manager_id: managerId.id
+                // Employee Role AND Employee Manager Selected
+                if(employeeRole !== 'None' && employeeManager !== 'None') {
+                    const params = {
+                        first_name: firstName,
+                        last_name: lastName,
+                        role_id: chosenRole.id,
+                        manager_id: managerId.id
+                    }
+                    const [rows, fields] = await promisePool.query(sql, params);
+                } 
+                // ONLY Employee Role Selected
+                else if (employeeRole && (employeeManager === 'None')) {
+                    const params = {
+                        first_name: firstName,
+                        last_name: lastName,
+                        role_id: chosenRole.id
                 }
-                const [rows, fields] = await promisePool.query(sql, params);
+                    const [rows, fields] = await promisePool.query(sql, params);
+                } 
+                // ONLY Employee Manager Selected
+                else if (employeeRole === 'None' && employeeManager) {
+                    const params = {
+                        first_name: firstName,
+                        last_name: lastName,
+                        manager_id: managerId.id
+                    }
+                    const [rows, fields] = await promisePool.query(sql, params);
+                }
+                // Restart Process
                 start();
             })
     } catch (err){
@@ -252,6 +301,7 @@ addEmployee = async () => {
 }
 
 updateEmployee = async () => {
+    // Find All Employees And Push Names Into An Array
     const employeeSQL = `SELECT * FROM employee;`
     const employeeArray = [];
     const [employeeRow, arrField] = await promisePool.query(employeeSQL);
@@ -259,17 +309,20 @@ updateEmployee = async () => {
         employeeArray.push(`${item.first_name} ${item.last_name}`);
     });
 
+    // Find All Managers And Push Names Into An Array
     const managersSQL = `SELECT * FROM employee WHERE role_id = 2;`;
     const managersArray = [];
     const [manager, mgrField] = await promisePool.execute(managersSQL);
     manager.filter(item => managersArray.push(`${item.first_name} ${item.last_name}`));
 
+    // Find All Roles And Push Names Into An Array
     const roleSQL = `SELECT * FROM roles;`;
     const rolesArray = [];
     const [role, info] = await promisePool.execute(roleSQL);
     role.filter(role => rolesArray.push(role.title));
     
     inquirer
+    // Prompt The User
         .prompt([
             {
                 type: 'list',
@@ -332,24 +385,28 @@ updateEmployee = async () => {
                 choices: rolesArray
             }
         ])
+    // Then Perform Logic
         .then(async ({employee, newFirstName, newLastName, newManager, newRole}) => {
+            // UPDATE Statement
             const sql = `UPDATE employee SET ? WHERE ?`;
 
+            // Find Employee Object In Database
             const matched = employeeRow.find(item => {
                 const name = `${item.first_name} ${item.last_name}`;
                 return name === employee;
             });
 
+            // Update First Name
             if (newFirstName) {
                 const params = [{first_name: newFirstName}, {id: matched.id}];
                 const query = await promisePool.query(sql, params);
             };
-
+            // Update Last Name
             if (newLastName) {
                 const params = [{last_name: newLastName}, {id: matched.id}];
                 const query = await promisePool.query(sql, params);
             };
-
+            // Update Manager
             if(newManager){
                 const managerObj = manager.find(item => {
                     const managerName = (`${item.first_name} ${item.last_name}`);
@@ -361,11 +418,13 @@ updateEmployee = async () => {
                 ];
                 const query = await promisePool.query(sql, params);
             }
+            // Update Employee Role
             if(newRole){
                 const roleObj = role.find(item => item.title === newRole);
                 const params = [{role_id: roleObj.id}, {id: matched.id}]
                 const query = await promisePool.query(sql, params);
             }
+            // Start process again
             start();
         })
 }
